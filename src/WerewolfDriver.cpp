@@ -39,6 +39,19 @@ struct WerewolfDriver::Private
 	std::vector<PlayerRole> roles;
 	std::vector<Player *> players;
 	PlayerRole extraCards[3];
+
+	void updateConfig()
+	{
+		JsonObject config;
+
+		JsonArray roles;
+		for (PlayerRole role : this->roles) {
+			roles.push_back(static_cast<int>(role));
+		}
+		config["roles"] = roles;
+
+		this->config = std::move(config);
+	}
 };
 
 WerewolfDriver::WerewolfDriver()
@@ -72,19 +85,12 @@ void WerewolfDriver::setConfig(const KA_IMPORT Json &config)
 			}
 		}
 	}
+
+	d->updateConfig();
 }
 
 const Json &WerewolfDriver::config() const
 {
-	JsonObject config;
-
-	JsonArray roles;
-	for (PlayerRole role : d->roles) {
-		roles.push_back(static_cast<int>(role));
-	}
-	config["roles"] = roles;
-
-	d->config = std::move(config);
 	return d->config;
 }
 
