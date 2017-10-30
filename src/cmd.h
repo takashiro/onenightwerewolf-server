@@ -28,6 +28,7 @@ namespace cmd
 	{
 		Invalid = KA_IMPORT net::NetworkCommandCount,
 
+		UpdatePlayer,
 		DeliverRoleCard,
 		ChoosePlayer,
 		EndGame,

@@ -34,6 +34,30 @@ KA_USING_NAMESPACE
 std::map<int, KA_IMPORT UserAction> CreateWerewolfActions()
 {
 	static std::map<int, UserAction> actions;
+
+	actions[cmd::UpdatePlayer] = [] (User *user, const Json &arg) {
+		if (!arg.isObject() || !arg.contains("info")) {
+			return;
+		}
+
+		Room *room = user->room();
+		if (room == nullptr) {
+			return;
+		}
+
+		Json info = arg["info"];
+		info["id"] = user->id();
+
+		if (arg.contains("receiver")) {
+			User *receiver = room->findUser(arg["receiver"].toInt());
+			if (receiver) {
+				receiver->notify(cmd::UpdatePlayer, info);
+			}
+		} else {
+			room->broadcastNotification(cmd::UpdatePlayer, info, user);
+		}
+	};
+
 	return actions;
 }
 
