@@ -18,34 +18,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 takashiro@qq.com
 ************************************************************************/
 
-#pragma once
+#include "cmd.h"
 
-#include "PlayerRole.h"
+#include "WerewolfDriver.h"
 
-#include <GameDriver.h>
+#include <Room.h>
+#include <User.h>
+#include <UserAction.h>
+#include <Json.h>
 
-#include <vector>
+#include <map>
 
-class WerewolfDriver : public KA_IMPORT GameDriver
+KA_USING_NAMESPACE
+
+std::map<int, KA_IMPORT UserAction> CreateWerewolfActions()
 {
-public:
-	WerewolfDriver();
-	~WerewolfDriver();
+	static std::map<int, UserAction> actions;
+	return actions;
+}
 
-	void setConfig(const KA_IMPORT Json &config) override;
-	const KA_IMPORT Json &config() const override;
-
-	void run() override;
-	void end() override;
-
-	void addPlayer(KA_IMPORT User *user) override;
-	void removePlayer(KA_IMPORT User *user) override;
-
-	const std::map<int, KA_IMPORT UserAction> *actions() const override;
-
-	void setRoles(std::vector<PlayerRole> &&roles);
-	const std::vector<PlayerRole> &roles() const;
-
-private:
-	KA_DECLARE_PRIVATE
-};
+const std::map<int, KA_IMPORT UserAction> *WerewolfDriver::actions() const
+{
+	static std::map<int, UserAction> actions = CreateWerewolfActions();
+	return &actions;
+}

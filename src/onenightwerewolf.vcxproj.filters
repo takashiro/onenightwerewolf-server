@@ -4,6 +4,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="WerewolfDriver.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="cmd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WerewolfDriver.h" />

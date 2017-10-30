@@ -25,13 +25,18 @@ takashiro@qq.com
 #include "PlayerRole.h"
 
 #include <Room.h>
+#include <Json.h>
 
 #include <vector>
 #include <thread>
 #include <algorithm>
 
+KA_USING_NAMESPACE
+
 struct WerewolfDriver::Private
 {
+	Json config;
+	std::vector<PlayerRole> roles;
 	std::vector<Player *> players;
 	PlayerRole extraCards[3];
 };
@@ -46,9 +51,45 @@ WerewolfDriver::~WerewolfDriver()
 	delete d;
 }
 
-void WerewolfDriver::start()
+void WerewolfDriver::setConfig(const KA_IMPORT Json &config)
 {
-	room()->broadcastNotification(cmd::StartGame);
+	if (!config.isObject()) {
+		return;
+	}
+
+	JsonObject setting = config.toObject();
+	if (setting.find("roles") != setting.end()) {
+		Json role_list = setting.at("roles");
+		if (role_list.isArray()) {
+			JsonArray roles = role_list.toArray();
+			d->roles.clear();
+			int max_value = static_cast<int>(PlayerRole::MaxLimit);
+			for (const Json &role : roles) {
+				int role_value = role.toInt();
+				if (role_value < max_value) {
+					d->roles.push_back(static_cast<PlayerRole>(role_value));
+				}
+			}
+		}
+	}
+}
+
+const Json &WerewolfDriver::config() const
+{
+	JsonObject config;
+
+	JsonArray roles;
+	for (PlayerRole role : d->roles) {
+		roles.push_back(static_cast<int>(role));
+	}
+	config["roles"] = roles;
+
+	d->config = std::move(config);
+	return d->config;
+}
+
+void WerewolfDriver::run()
+{
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	std::vector<PlayerRole> roles(d->players.size() + 3);
@@ -87,4 +128,14 @@ void WerewolfDriver::removePlayer(KA_IMPORT User *user)
 	d->players.erase(std::find_if(d->players.begin(), d->players.end(), [=] (Player *player) {
 		return player->user() == user;
 	}));
+}
+
+void WerewolfDriver::setRoles(std::vector<PlayerRole> &&roles)
+{
+	d->roles = std::move(roles);
+}
+
+const std::vector<PlayerRole> &WerewolfDriver::roles() const
+{
+	return d->roles;
 }
