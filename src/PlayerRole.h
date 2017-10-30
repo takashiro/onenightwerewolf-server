@@ -35,5 +35,7 @@ enum class PlayerRole
 	Insomniac,
 	Hunter,
 	Villager,
-	Tanner
+	Tanner,
+
+	MaxLimit
 };
