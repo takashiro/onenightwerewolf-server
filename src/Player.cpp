@@ -62,7 +62,6 @@ void Player::setRole(Role role)
 	d->role = role;
 }
 
-
 void Player::deliverRoleCard()
 {
 	if (d->user) {

@@ -98,10 +98,7 @@ void WerewolfDriver::run()
 {
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
-	std::vector<PlayerRole> roles(d->players.size() + 3);
-	for (int i = 0; i < roles.size(); i++) {
-		roles[i] = static_cast<PlayerRole>(i);
-	}
+	std::vector<PlayerRole> roles = d->roles;
 
 	// Arrange roles
 	std::random_shuffle(roles.begin(), roles.end());
