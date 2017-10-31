@@ -92,6 +92,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="PlayerAction.cpp" />
+    <ClCompile Include="standard-roles.cpp" />
     <ClCompile Include="WerewolfDriver.cpp" />
   </ItemGroup>
   <ItemGroup>

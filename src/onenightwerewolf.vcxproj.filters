@@ -6,6 +6,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="PlayerAction.cpp" />
+    <ClCompile Include="standard-roles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WerewolfDriver.h" />
