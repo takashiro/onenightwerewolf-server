@@ -5,11 +5,13 @@
     <ClCompile Include="WerewolfDriver.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="cmd.cpp" />
+    <ClCompile Include="PlayerAction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WerewolfDriver.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerRole.h" />
     <ClInclude Include="cmd.h" />
+    <ClInclude Include="PlayerAction.h" />
   </ItemGroup>
 </Project>

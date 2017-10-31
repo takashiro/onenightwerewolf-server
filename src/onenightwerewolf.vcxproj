@@ -91,12 +91,14 @@
     <ClCompile Include="cmd.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerAction.cpp" />
     <ClCompile Include="WerewolfDriver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cmd.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="PlayerRole.h" />
+    <ClInclude Include="PlayerAction.h" />
     <ClInclude Include="WerewolfDriver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
