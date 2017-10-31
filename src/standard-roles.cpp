@@ -30,8 +30,40 @@ takashiro@qq.com
 
 KA_USING_NAMESPACE
 
+class Doppelganger : public PlayerAction
+{
+public:
+	Doppelganger()
+		: PlayerAction(PlayerRole::Doppelganger, 0)
+	{
+	}
+
+	void takeEffect(WerewolfDriver *driver, Player *player) const override
+	{
+		player->one(cmd::ChoosePlayer, [=] (const Json &args) {
+			uint chosen_id = args.toUInt();
+			Player *target = driver->findPlayer(chosen_id);
+			if (target) {
+				player->setRole(target->role());
+
+				User *user = player->user();
+				if (user) {
+					JsonObject args;
+					args["uid"] = chosen_id;
+					args["role"] = static_cast<int>(target->role());
+					user->notify(cmd::ShowPlayerRole, args);
+				}
+			}
+		});
+
+		Room *room = driver->room();
+		room->broadcastNotification(cmd::ChoosePlayer, 1);
+	}
+};
+
 std::vector<PlayerAction *> CreatePlayerActions()
 {
 	std::vector<PlayerAction *> actions;
+	actions.push_back(new Doppelganger);
 	return actions;
 }
