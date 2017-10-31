@@ -23,6 +23,7 @@ takashiro@qq.com
 #include "cmd.h"
 #include "Player.h"
 #include "PlayerRole.h"
+#include "PlayerAction.h"
 
 #include <Room.h>
 #include <Json.h>
@@ -39,6 +40,12 @@ struct WerewolfDriver::Private
 	std::vector<PlayerRole> roles;
 	std::vector<Player *> players;
 	PlayerRole extraCards[3];
+	std::vector<PlayerAction *> &actions;
+
+	Private()
+		: actions(LoadPlayerActions())
+	{
+	}
 
 	void updateConfig()
 	{
@@ -114,6 +121,21 @@ void WerewolfDriver::run()
 	// Notify roles
 	for (Player *player : d->players) {
 		player->deliverRoleCard();
+	}
+
+	std::this_thread::sleep_for(std::chrono::seconds(3));
+
+	std::sort(d->actions.begin(), d->actions.end(), [] (const PlayerAction *a1, const PlayerAction *a2) {
+		return a1->priority() < a2->priority();
+	});
+
+	for (const PlayerAction *action : d->actions) {
+		for (Player *player : d->players) {
+			if (action->isEffective(player)) {
+				action->takeEffect(this, player);
+			}
+		}
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
 }
 
