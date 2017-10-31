@@ -20,6 +20,7 @@ takashiro@qq.com
 
 #include "cmd.h"
 
+#include "Player.h"
 #include "WerewolfDriver.h"
 
 #include <Room.h>
@@ -55,6 +56,23 @@ std::map<int, KA_IMPORT UserAction> CreateWerewolfActions()
 			}
 		} else {
 			room->broadcastNotification(cmd::UpdatePlayer, info, user);
+		}
+	};
+
+	actions[cmd::ChoosePlayer] = [] (User *user, const Json &arg) {
+		Room *room = user->room();
+		if (room == nullptr) {
+			return;
+		}
+
+		WerewolfDriver *driver = dynamic_cast<WerewolfDriver *>(room->driver());
+		if (driver == nullptr) {
+			return;
+		}
+
+		Player *player = driver->findPlayer(user->id());
+		if (player) {
+			player->fire(cmd::ChoosePlayer, arg);
 		}
 	};
 
