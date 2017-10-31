@@ -31,6 +31,7 @@ namespace cmd
 		UpdatePlayer,
 		DeliverRoleCard,
 		ChoosePlayer,
+		ShowPlayerRole,
 		EndGame,
 
 		Count
