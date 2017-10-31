@@ -23,11 +23,15 @@ takashiro@qq.com
 #include "cmd.h"
 
 #include <Json.h>
+#include <User.h>
+
+#include <map>
 
 struct Player::Private
 {
 	KA_IMPORT User *user;
 	PlayerRole role;
+	std::multimap<int, Player::Callback> callbacks;
 
 	Private()
 		: user(nullptr)
@@ -68,4 +72,19 @@ void Player::deliverRoleCard()
 		int role = static_cast<int>(d->role);
 		d->user->notify(cmd::DeliverRoleCard, role);
 	}
+}
+
+void Player::one(int command, const Callback &callback)
+{
+	d->callbacks.insert(std::pair<int, const Callback &>(command, callback));
+}
+
+void Player::fire(int command, const KA_IMPORT Json &args)
+{
+	auto range = d->callbacks.equal_range(command);
+	for (auto i = range.first; i != range.second; i++) {
+		i->second(args);
+	}
+
+	d->callbacks.erase(command);
 }

@@ -23,6 +23,9 @@ takashiro@qq.com
 #include "PlayerRole.h"
 
 #include <User.h>
+#include <Json.h>
+
+#include <functional>
 
 class Player
 {
@@ -38,6 +41,10 @@ public:
 	void setRole(Role role);
 
 	void deliverRoleCard();
+
+	using Callback = std::function<void(const KA_IMPORT Json &)>;
+	void one(int command, const Callback &callback);
+	void fire(int command, const KA_IMPORT Json &args);
 
 private:
 	KA_DECLARE_PRIVATE
