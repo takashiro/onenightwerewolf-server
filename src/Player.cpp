@@ -27,9 +27,11 @@ takashiro@qq.com
 
 #include <map>
 
+KA_USING_NAMESPACE
+
 struct Player::Private
 {
-	KA_IMPORT User *user;
+	User *user;
 	PlayerRole role;
 	std::multimap<int, Player::Callback> callbacks;
 
@@ -72,6 +74,14 @@ void Player::deliverRoleCard()
 		int role = static_cast<int>(d->role);
 		d->user->notify(cmd::DeliverRoleCard, role);
 	}
+}
+
+void Player::showPlayerRole(Player *target)
+{
+	JsonObject args;
+	args["uid"] = target->user()->id();
+	args["role"] = static_cast<int>(target->role());
+	d->user->notify(cmd::ShowPlayerRole, args);
 }
 
 void Player::one(int command, const Callback &callback)

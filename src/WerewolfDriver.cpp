@@ -171,3 +171,14 @@ Player *WerewolfDriver::findPlayer(KA_IMPORT uint id) const
 	}
 	return nullptr;
 }
+
+std::vector<Player *> WerewolfDriver::findPlayers(PlayerRole role) const
+{
+	std::vector<Player *> targets;
+	for (Player *target : d->players) {
+		if (target->role() == role) {
+			targets.push_back(target);
+		}
+	}
+	return targets;
+}

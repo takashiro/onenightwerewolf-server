@@ -28,6 +28,9 @@ takashiro@qq.com
 #include <Json.h>
 #include <Room.h>
 
+#include <thread>
+#include <chrono>
+
 KA_USING_NAMESPACE
 
 class Doppelganger : public PlayerAction
@@ -45,14 +48,7 @@ public:
 			Player *target = driver->findPlayer(chosen_id);
 			if (target) {
 				player->setRole(target->role());
-
-				User *user = player->user();
-				if (user) {
-					JsonObject args;
-					args["uid"] = chosen_id;
-					args["role"] = static_cast<int>(target->role());
-					user->notify(cmd::ShowPlayerRole, args);
-				}
+				player->showPlayerRole(target);
 			}
 		});
 
@@ -61,9 +57,32 @@ public:
 	}
 };
 
+class Werewolf : public PlayerAction
+{
+public:
+	Werewolf()
+		: PlayerAction(PlayerRole::Werewolf, 1)
+	{
+	}
+
+	void takeEffect(WerewolfDriver *driver, Player *player) const override
+	{
+		std::vector<Player *> wolves = driver->findPlayers(PlayerRole::Werewolf);
+		for (Player *wolf : wolves) {
+			if (wolf == player) {
+				continue;
+			}
+			player->showPlayerRole(wolf);
+		}
+
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+	}
+};
+
 std::vector<PlayerAction *> CreatePlayerActions()
 {
 	std::vector<PlayerAction *> actions;
 	actions.push_back(new Doppelganger);
+	actions.push_back(new Werewolf);
 	return actions;
 }

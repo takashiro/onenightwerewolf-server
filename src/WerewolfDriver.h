@@ -49,6 +49,7 @@ public:
 	const std::vector<PlayerRole> &roles() const;
 
 	Player *findPlayer(KA_IMPORT uint id) const;
+	std::vector<Player *> findPlayers(PlayerRole role) const;
 
 private:
 	KA_DECLARE_PRIVATE
