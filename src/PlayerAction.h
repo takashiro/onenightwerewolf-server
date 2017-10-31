@@ -44,14 +44,4 @@ private:
 	int mPriority;
 };
 
-std::vector<PlayerAction *> &LoadPlayerActions();
-
-#define ONUW_ADD_ACTION(action) namespace{\
-	struct Init{\
-		Init(){\
-			std::vector<PlayerAction *> &actions = LoadPlayerActions();\
-			actions.push_back(new action);\
-		}\
-	};\
-	Init init;\
-}
+std::vector<PlayerAction *> CreatePlayerActions();

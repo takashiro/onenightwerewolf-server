@@ -26,6 +26,8 @@ takashiro@qq.com
 
 #include <vector>
 
+class Player;
+
 class WerewolfDriver : public KA_IMPORT GameDriver
 {
 public:
@@ -45,6 +47,8 @@ public:
 
 	void setRoles(std::vector<PlayerRole> &&roles);
 	const std::vector<PlayerRole> &roles() const;
+
+	Player *findPlayer(KA_IMPORT uint id) const;
 
 private:
 	KA_DECLARE_PRIVATE

@@ -40,12 +40,6 @@ struct WerewolfDriver::Private
 	std::vector<PlayerRole> roles;
 	std::vector<Player *> players;
 	PlayerRole extraCards[3];
-	std::vector<PlayerAction *> &actions;
-
-	Private()
-		: actions(LoadPlayerActions())
-	{
-	}
 
 	void updateConfig()
 	{
@@ -125,18 +119,21 @@ void WerewolfDriver::run()
 
 	std::this_thread::sleep_for(std::chrono::seconds(3));
 
-	std::sort(d->actions.begin(), d->actions.end(), [] (const PlayerAction *a1, const PlayerAction *a2) {
+	std::vector<PlayerAction *> actions = CreatePlayerActions();
+	std::sort(actions.begin(), actions.end(), [] (const PlayerAction *a1, const PlayerAction *a2) {
 		return a1->priority() < a2->priority();
 	});
 
-	for (const PlayerAction *action : d->actions) {
+	for (const PlayerAction *action : actions) {
 		for (Player *player : d->players) {
 			if (action->isEffective(player)) {
 				action->takeEffect(this, player);
 			}
 		}
+		delete action;
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 	}
+	actions.clear();
 }
 
 void WerewolfDriver::end()
@@ -163,4 +160,14 @@ void WerewolfDriver::setRoles(std::vector<PlayerRole> &&roles)
 const std::vector<PlayerRole> &WerewolfDriver::roles() const
 {
 	return d->roles;
+}
+
+Player *WerewolfDriver::findPlayer(KA_IMPORT uint id) const
+{
+	for (Player *player : d->players) {
+		if (player->user()->id() == id) {
+			return player;
+		}
+	}
+	return nullptr;
 }

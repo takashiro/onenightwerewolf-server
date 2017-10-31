@@ -31,9 +31,3 @@ bool PlayerAction::isEffective(Player *player) const
 {
 	return mRole == player->role();
 }
-
-std::vector<PlayerAction *> &LoadPlayerActions()
-{
-	static std::vector<PlayerAction *> actions;
-	return actions;
-}
