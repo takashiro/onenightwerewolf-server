@@ -245,5 +245,6 @@ std::vector<PlayerAction *> CreatePlayerActions()
 	actions.push_back(new Mason);
 	actions.push_back(new Seer);
 	actions.push_back(new Robber);
+	actions.push_back(new TroubleMaker);
 	return actions;
 }
