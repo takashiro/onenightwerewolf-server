@@ -84,6 +84,14 @@ void Player::showPlayerRole(Player *target)
 	d->user->notify(cmd::ShowPlayerRole, args);
 }
 
+void Player::showExtraCard(KA_IMPORT uint id, PlayerRole role)
+{
+	JsonObject info;
+	info["id"] = id;
+	info["role"] = static_cast<int>(role);
+	d->user->notify(cmd::ShowExtraCard, info);
+}
+
 void Player::one(int command, const Callback &callback)
 {
 	d->callbacks.insert(std::pair<int, const Callback &>(command, callback));

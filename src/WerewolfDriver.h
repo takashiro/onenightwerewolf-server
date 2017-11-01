@@ -51,6 +51,8 @@ public:
 	Player *findPlayer(KA_IMPORT uint id) const;
 	std::vector<Player *> findPlayers(PlayerRole role) const;
 
+	const PlayerRole *extraCards() const;
+
 private:
 	KA_DECLARE_PRIVATE
 };

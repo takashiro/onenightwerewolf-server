@@ -117,6 +117,55 @@ public:
 	}
 };
 
+class Seer : public PlayerAction
+{
+public:
+	Seer()
+		: PlayerAction(PlayerRole::Seer, 4)
+	{
+	}
+
+	void takeEffect(WerewolfDriver *driver, Player *seer) const override
+	{
+		seer->one(cmd::ChoosePlayerOrCard, [=] (const Json &args) {
+			if (!args.isObject()) {
+				return;
+			}
+
+			bool choose_player = true;
+			const JsonObject &input = args.toObject();
+			auto i = input.find("type");
+			if (i != input.end() && i->second.toString() == "card") {
+				choose_player = false;
+			}
+
+			auto j = input.find("targets");
+			if (j != input.end() && i->second.isArray()) {
+				const JsonArray &chosen = i->second.toArray();
+				if (chosen.empty()) {
+					return;
+				}
+
+				if (choose_player) {
+					Player *target = driver->findPlayer(chosen.front().toUInt());
+					if (target) {
+						seer->showPlayerRole(target);
+					}
+				} else {
+					const PlayerRole *extra_cards = driver->extraCards();
+					for (const Json &target : chosen) {
+						uint id = target.toUInt();
+						if (id < 3) {
+							seer->showExtraCard(id, extra_cards[id]);
+						}
+					}
+				}
+				std::this_thread::sleep_for(std::chrono::seconds(3));
+			}
+		});
+	}
+};
+
 std::vector<PlayerAction *> CreatePlayerActions()
 {
 	std::vector<PlayerAction *> actions;
@@ -124,5 +173,6 @@ std::vector<PlayerAction *> CreatePlayerActions()
 	actions.push_back(new Werewolf);
 	actions.push_back(new Minion);
 	actions.push_back(new Mason);
+	actions.push_back(new Seer);
 	return actions;
 }

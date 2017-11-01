@@ -182,3 +182,8 @@ std::vector<Player *> WerewolfDriver::findPlayers(PlayerRole role) const
 	}
 	return targets;
 }
+
+const PlayerRole *WerewolfDriver::extraCards() const
+{
+	return d->extraCards;
+}
