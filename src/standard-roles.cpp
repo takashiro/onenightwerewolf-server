@@ -166,6 +166,31 @@ public:
 	}
 };
 
+class Robber : public PlayerAction
+{
+public:
+	Robber()
+		: PlayerAction(PlayerRole::Robber, 5)
+	{
+	}
+
+	void takeEffect(WerewolfDriver *driver, Player *robber) const override
+	{
+		robber->one(cmd::ChoosePlayer, [=] (const Json &args) {
+			uint chosen_id = args.toUInt();
+			Player *target = driver->findPlayer(chosen_id);
+			if (target) {
+				robber->showPlayerRole(target);
+				robber->setRole(target->role());
+				target->setRole(PlayerRole::Robber);
+			}
+		});
+
+		Room *room = driver->room();
+		room->broadcastNotification(cmd::ChoosePlayer, 1);
+	}
+};
+
 std::vector<PlayerAction *> CreatePlayerActions()
 {
 	std::vector<PlayerAction *> actions;
@@ -174,5 +199,6 @@ std::vector<PlayerAction *> CreatePlayerActions()
 	actions.push_back(new Minion);
 	actions.push_back(new Mason);
 	actions.push_back(new Seer);
+	actions.push_back(new Robber);
 	return actions;
 }
