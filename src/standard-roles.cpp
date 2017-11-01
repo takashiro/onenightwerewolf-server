@@ -196,16 +196,6 @@ public:
 	{
 	}
 
-	void onGameStart(WerewolfDriver *driver) override
-	{
-		mTroubleMakers = driver->findPlayers(PlayerRole::TroubleMaker);
-	}
-
-	bool isEffective(Player *player) const override
-	{
-		return std::find(mTroubleMakers.begin(), mTroubleMakers.end(), player) != mTroubleMakers.end();
-	}
-
 	void takeEffect(WerewolfDriver *driver, Player *trouble_maker) const override
 	{
 		driver->broadcastToChoosePlayer(2);
@@ -231,9 +221,33 @@ public:
 		target[0]->setRole(target[1]->role());
 		target[1]->setRole(tmp);
 	}
+};
 
-private:
-	std::vector<Player *> mTroubleMakers;
+class Drunk : public PlayerAction
+{
+public:
+	Drunk()
+		: PlayerAction(PlayerRole::Drunk, 7)
+	{
+	}
+
+	void takeEffect(WerewolfDriver *driver, Player *drunk) const override
+	{
+		driver->broadcastToChooseCard(1);
+
+		Json answer = drunk->getReply();
+		if (answer.isNull()) {
+			return;
+		}
+
+		uint card_id = answer.toUInt();
+		if (card_id < 3) {
+			PlayerRole *cards = driver->extraCards();
+			PlayerRole old_role = drunk->role();
+			drunk->setRole(cards[card_id]);
+			cards[card_id] = old_role;
+		}
+	}
 };
 
 std::vector<PlayerAction *> CreatePlayerActions()
@@ -246,5 +260,6 @@ std::vector<PlayerAction *> CreatePlayerActions()
 	actions.push_back(new Seer);
 	actions.push_back(new Robber);
 	actions.push_back(new TroubleMaker);
+	actions.push_back(new Drunk);
 	return actions;
 }

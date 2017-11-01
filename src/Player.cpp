@@ -33,6 +33,7 @@ struct Player::Private
 {
 	User *user;
 	PlayerRole role;
+	PlayerRole initialRole;
 	std::multimap<int, Player::Callback> callbacks;
 
 	Private()
@@ -66,6 +67,16 @@ Player::Role Player::role() const
 void Player::setRole(Role role)
 {
 	d->role = role;
+}
+
+Player::Role Player::initialRole() const
+{
+	return d->initialRole;
+}
+
+void Player::setInitialRole(Role role)
+{
+	d->initialRole = role;
 }
 
 void Player::deliverRoleCard()

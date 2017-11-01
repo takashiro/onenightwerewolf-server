@@ -51,10 +51,12 @@ public:
 	Player *findPlayer(KA_IMPORT uint id) const;
 	std::vector<Player *> findPlayers(PlayerRole role) const;
 
+	PlayerRole *extraCards();
 	const PlayerRole *extraCards() const;
 
 	void broadcastToChoosePlayer(int num);
 	void broadcastToChoosePlayerOrCard(int player_num, int card_num);
+	void broadcastToChooseCard(int num);
 
 private:
 	KA_DECLARE_PRIVATE

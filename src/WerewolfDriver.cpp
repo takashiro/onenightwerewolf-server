@@ -106,6 +106,7 @@ void WerewolfDriver::run()
 	int i = 0;
 	for (Player *player : d->players) {
 		player->setRole(roles[i]);
+		player->setInitialRole(roles[i]);
 		i++;
 	}
 	for (int j = 0; j < 3; j++, i++) {
@@ -123,10 +124,6 @@ void WerewolfDriver::run()
 	std::sort(actions.begin(), actions.end(), [] (const PlayerAction *a1, const PlayerAction *a2) {
 		return a1->priority() < a2->priority();
 	});
-
-	for (PlayerAction *action : actions) {
-		action->onGameStart(this);
-	}
 
 	for (const PlayerAction *action : actions) {
 		for (Player *player : d->players) {
@@ -187,6 +184,11 @@ std::vector<Player *> WerewolfDriver::findPlayers(PlayerRole role) const
 	return targets;
 }
 
+PlayerRole *WerewolfDriver::extraCards()
+{
+	return d->extraCards;
+}
+
 const PlayerRole *WerewolfDriver::extraCards() const
 {
 	return d->extraCards;
@@ -203,4 +205,9 @@ void WerewolfDriver::broadcastToChoosePlayerOrCard(int player_num, int card_num)
 	args["player"] = player_num;
 	args["card"] = card_num;
 	room()->broadcastRequest(cmd::ChoosePlayerOrCard, args);
+}
+
+void WerewolfDriver::broadcastToChooseCard(int num)
+{
+	room()->broadcastRequest(cmd::ChooseCard, num);
 }

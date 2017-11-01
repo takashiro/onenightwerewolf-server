@@ -27,11 +27,7 @@ PlayerAction::PlayerAction(PlayerRole role, int priority)
 {
 }
 
-void PlayerAction::onGameStart(WerewolfDriver *driver)
-{
-}
-
 bool PlayerAction::isEffective(Player *player) const
 {
-	return mRole == player->role();
+	return mRole == player->initialRole();
 }

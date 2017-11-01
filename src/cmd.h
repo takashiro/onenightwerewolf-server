@@ -32,6 +32,7 @@ namespace cmd
 		DeliverRoleCard,
 		ChoosePlayer,
 		ChoosePlayerOrCard,
+		ChooseCard,
 		ShowPlayerRole,
 		ShowExtraCard,
 		EndGame,

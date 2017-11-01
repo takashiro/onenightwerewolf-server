@@ -40,6 +40,9 @@ public:
 	Role role() const;
 	void setRole(Role role);
 
+	Role initialRole() const;
+	void setInitialRole(Role role);
+
 	void deliverRoleCard();
 
 	void showPlayerRole(Player *target);
