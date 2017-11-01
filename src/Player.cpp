@@ -92,6 +92,11 @@ void Player::showExtraCard(KA_IMPORT uint id, PlayerRole role)
 	d->user->notify(cmd::ShowExtraCard, info);
 }
 
+KA_IMPORT Json Player::getReply() const
+{
+	return d->user->getReply();
+}
+
 void Player::one(int command, const Callback &callback)
 {
 	d->callbacks.insert(std::pair<int, const Callback &>(command, callback));

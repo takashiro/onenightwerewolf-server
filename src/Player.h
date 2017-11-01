@@ -45,6 +45,8 @@ public:
 	void showPlayerRole(Player *target);
 	void showExtraCard(KA_IMPORT uint id, PlayerRole role);
 
+	KA_IMPORT Json getReply() const;
+
 	using Callback = std::function<void(const KA_IMPORT Json &)>;
 	void one(int command, const Callback &callback);
 	void fire(int command, const KA_IMPORT Json &args);

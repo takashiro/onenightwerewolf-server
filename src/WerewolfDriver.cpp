@@ -124,6 +124,10 @@ void WerewolfDriver::run()
 		return a1->priority() < a2->priority();
 	});
 
+	for (PlayerAction *action : actions) {
+		action->onGameStart(this);
+	}
+
 	for (const PlayerAction *action : actions) {
 		for (Player *player : d->players) {
 			if (action->isEffective(player)) {
@@ -186,4 +190,9 @@ std::vector<Player *> WerewolfDriver::findPlayers(PlayerRole role) const
 const PlayerRole *WerewolfDriver::extraCards() const
 {
 	return d->extraCards;
+}
+
+void WerewolfDriver::broadcastToChoosePlayer(int num)
+{
+	room()->broadcastRequest(cmd::ChoosePlayer, num);
 }

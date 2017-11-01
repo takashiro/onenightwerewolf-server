@@ -53,6 +53,8 @@ public:
 
 	const PlayerRole *extraCards() const;
 
+	void broadcastToChoosePlayer(int num);
+
 private:
 	KA_DECLARE_PRIVATE
 };

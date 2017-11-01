@@ -26,10 +26,10 @@ takashiro@qq.com
 #include "WerewolfDriver.h"
 
 #include <Json.h>
-#include <Room.h>
 
-#include <thread>
+#include <algorithm>
 #include <chrono>
+#include <thread>
 
 KA_USING_NAMESPACE
 
@@ -52,8 +52,7 @@ public:
 			}
 		});
 
-		Room *room = driver->room();
-		room->broadcastNotification(cmd::ChoosePlayer, 1);
+		driver->broadcastToChoosePlayer(1);
 	}
 };
 
@@ -186,9 +185,56 @@ public:
 			}
 		});
 
-		Room *room = driver->room();
-		room->broadcastNotification(cmd::ChoosePlayer, 1);
+		driver->broadcastToChoosePlayer(1);
 	}
+};
+
+class TroubleMaker : public PlayerAction
+{
+public:
+	TroubleMaker()
+		: PlayerAction(PlayerRole::TroubleMaker, 6)
+	{
+	}
+
+	void onGameStart(WerewolfDriver *driver) override
+	{
+		mTroubleMakers = driver->findPlayers(PlayerRole::TroubleMaker);
+	}
+
+	bool isEffective(Player *player) const override
+	{
+		return std::find(mTroubleMakers.begin(), mTroubleMakers.end(), player) != mTroubleMakers.end();
+	}
+
+	void takeEffect(WerewolfDriver *driver, Player *trouble_maker) const override
+	{
+		driver->broadcastToChoosePlayer(2);
+
+		Json answer = trouble_maker->getReply();
+		if (!answer.isArray()) {
+			return;
+		}
+
+		const JsonArray &targets = answer.toArray();
+		JsonArray::const_iterator iter = targets.begin();
+		Player *target[2] = {nullptr};
+		for (int i = 0; i < 2; i++) {
+			target[i] = driver->findPlayer((*iter).toUInt());
+			iter++;
+		}
+
+		if (target[0] == nullptr || target[1] == nullptr) {
+			return;
+		}
+
+		PlayerRole tmp = target[0]->role();
+		target[0]->setRole(target[1]->role());
+		target[1]->setRole(tmp);
+	}
+
+private:
+	std::vector<Player *> mTroubleMakers;
 };
 
 std::vector<PlayerAction *> CreatePlayerActions()

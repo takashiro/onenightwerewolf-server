@@ -36,6 +36,8 @@ public:
 	PlayerRole role() const { return mRole; }
 	int priority() const { return mPriority; }
 
+	virtual void onGameStart(WerewolfDriver *driver);
+
 	virtual bool isEffective(Player *player) const;
 	virtual void takeEffect(WerewolfDriver *driver, Player *player) const = 0;
 
