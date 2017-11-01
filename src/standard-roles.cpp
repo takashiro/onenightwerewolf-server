@@ -97,11 +97,32 @@ public:
 	}
 };
 
+class Mason : public PlayerAction
+{
+public:
+	Mason()
+		: PlayerAction(PlayerRole::Mason, 3)
+	{
+	}
+
+	void takeEffect(WerewolfDriver *driver, Player *player) const override
+	{
+		std::vector<Player *> masons = driver->findPlayers(PlayerRole::Mason);
+		for (Player *mason : masons) {
+			if (mason == player) {
+				continue;
+			}
+			player->showPlayerRole(mason);
+		}
+	}
+};
+
 std::vector<PlayerAction *> CreatePlayerActions()
 {
 	std::vector<PlayerAction *> actions;
 	actions.push_back(new Doppelganger);
 	actions.push_back(new Werewolf);
 	actions.push_back(new Minion);
+	actions.push_back(new Mason);
 	return actions;
 }
