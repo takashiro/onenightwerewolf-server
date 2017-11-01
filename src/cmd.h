@@ -30,6 +30,7 @@ namespace cmd
 
 		UpdatePlayer,
 		DeliverRoleCard,
+		UpdatePhase,
 		ChoosePlayer,
 		ChoosePlayerOrCard,
 		ChooseCard,

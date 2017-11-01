@@ -44,4 +44,4 @@ private:
 	int mPriority;
 };
 
-std::vector<PlayerAction *> CreatePlayerActions();
+std::vector<PlayerAction *> CreatePlayerActions(const std::vector<PlayerRole> &roles);

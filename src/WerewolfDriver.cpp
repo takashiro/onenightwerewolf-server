@@ -120,21 +120,26 @@ void WerewolfDriver::run()
 
 	std::this_thread::sleep_for(std::chrono::seconds(3));
 
-	std::vector<PlayerAction *> actions = CreatePlayerActions();
+	std::vector<PlayerAction *> actions = CreatePlayerActions(d->roles);
 	std::sort(actions.begin(), actions.end(), [] (const PlayerAction *a1, const PlayerAction *a2) {
 		return a1->priority() < a2->priority();
 	});
 
+	Room *room = this->room();
+
 	for (const PlayerAction *action : actions) {
+		room->broadcastNotification(cmd::UpdatePhase, static_cast<int>(action->role()));
 		for (Player *player : d->players) {
 			if (action->isEffective(player)) {
 				action->takeEffect(this, player);
 			}
 		}
 		delete action;
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
 	actions.clear();
+
+	room->broadcastNotification(cmd::UpdatePhase, 0);
 }
 
 void WerewolfDriver::end()

@@ -29,6 +29,7 @@ takashiro@qq.com
 
 #include <algorithm>
 #include <chrono>
+#include <map>
 #include <thread>
 
 KA_USING_NAMESPACE
@@ -264,17 +265,40 @@ public:
 	}
 };
 
-std::vector<PlayerAction *> CreatePlayerActions()
+using ActionMap = std::map<PlayerRole, PlayerAction *(*)()>;
+
+#define ONW_ADD_ACTION(action) actions[PlayerRole::action] = [] () -> PlayerAction * { return new action; }
+
+static ActionMap CreateActionMap()
 {
+	ActionMap actions;
+	ONW_ADD_ACTION(Doppelganger);
+	ONW_ADD_ACTION(Werewolf);
+	ONW_ADD_ACTION(Minion);
+	ONW_ADD_ACTION(Mason);
+	ONW_ADD_ACTION(Seer);
+	ONW_ADD_ACTION(Robber);
+	ONW_ADD_ACTION(TroubleMaker);
+	ONW_ADD_ACTION(Drunk);
+	ONW_ADD_ACTION(Insomniac);
+	return actions;
+}
+
+#undef ONW_ADD_ACTION
+
+std::vector<PlayerAction *> CreatePlayerActions(const std::vector<PlayerRole> &roles)
+{
+	static ActionMap action_map = CreateActionMap();
+
 	std::vector<PlayerAction *> actions;
-	actions.push_back(new Doppelganger);
-	actions.push_back(new Werewolf);
-	actions.push_back(new Minion);
-	actions.push_back(new Mason);
-	actions.push_back(new Seer);
-	actions.push_back(new Robber);
-	actions.push_back(new TroubleMaker);
-	actions.push_back(new Drunk);
-	actions.push_back(new Insomniac);
+	for (PlayerRole role : roles) {
+		ActionMap::const_iterator iter = action_map.find(role);
+		if (iter != action_map.end()) {
+			PlayerAction *action = (iter->second)();
+			if (action) {
+				actions.push_back(action);
+			}
+		}
+	}
 	return actions;
 }
