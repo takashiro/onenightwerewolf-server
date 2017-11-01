@@ -250,6 +250,20 @@ public:
 	}
 };
 
+class Insomniac : public PlayerAction
+{
+public:
+	Insomniac()
+		: PlayerAction(PlayerRole::Insomniac, 8)
+	{
+	}
+
+	void takeEffect(WerewolfDriver *driver, Player *insomniac) const override
+	{
+		insomniac->showPlayerRole(insomniac);
+	}
+};
+
 std::vector<PlayerAction *> CreatePlayerActions()
 {
 	std::vector<PlayerAction *> actions;
@@ -261,5 +275,6 @@ std::vector<PlayerAction *> CreatePlayerActions()
 	actions.push_back(new Robber);
 	actions.push_back(new TroubleMaker);
 	actions.push_back(new Drunk);
+	actions.push_back(new Insomniac);
 	return actions;
 }
