@@ -54,6 +54,7 @@ public:
 	const PlayerRole *extraCards() const;
 
 	void broadcastToChoosePlayer(int num);
+	void broadcastToChoosePlayerOrCard(int player_num, int card_num);
 
 private:
 	KA_DECLARE_PRIVATE

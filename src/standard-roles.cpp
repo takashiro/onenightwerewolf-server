@@ -43,16 +43,15 @@ public:
 
 	void takeEffect(WerewolfDriver *driver, Player *player) const override
 	{
-		player->one(cmd::ChoosePlayer, [=] (const Json &args) {
-			uint chosen_id = args.toUInt();
-			Player *target = driver->findPlayer(chosen_id);
-			if (target) {
-				player->setRole(target->role());
-				player->showPlayerRole(target);
-			}
-		});
-
 		driver->broadcastToChoosePlayer(1);
+
+		Json answer = player->getReply();
+		uint chosen_id = answer.toUInt();
+		Player *target = driver->findPlayer(chosen_id);
+		if (target) {
+			player->setRole(target->role());
+			player->showPlayerRole(target);
+		}
 	}
 };
 
@@ -126,42 +125,43 @@ public:
 
 	void takeEffect(WerewolfDriver *driver, Player *seer) const override
 	{
-		seer->one(cmd::ChoosePlayerOrCard, [=] (const Json &args) {
-			if (!args.isObject()) {
+		driver->broadcastToChoosePlayerOrCard(1, 2);
+
+		Json answer = seer->getReply();
+		if (!answer.isObject()) {
+			return;
+		}
+
+		bool choose_player = true;
+		const JsonObject &input = answer.toObject();
+		auto i = input.find("type");
+		if (i != input.end() && i->second.toString() == "card") {
+			choose_player = false;
+		}
+
+		auto j = input.find("targets");
+		if (j != input.end() && i->second.isArray()) {
+			const JsonArray &chosen = i->second.toArray();
+			if (chosen.empty()) {
 				return;
 			}
 
-			bool choose_player = true;
-			const JsonObject &input = args.toObject();
-			auto i = input.find("type");
-			if (i != input.end() && i->second.toString() == "card") {
-				choose_player = false;
-			}
-
-			auto j = input.find("targets");
-			if (j != input.end() && i->second.isArray()) {
-				const JsonArray &chosen = i->second.toArray();
-				if (chosen.empty()) {
-					return;
+			if (choose_player) {
+				Player *target = driver->findPlayer(chosen.front().toUInt());
+				if (target) {
+					seer->showPlayerRole(target);
 				}
-
-				if (choose_player) {
-					Player *target = driver->findPlayer(chosen.front().toUInt());
-					if (target) {
-						seer->showPlayerRole(target);
-					}
-				} else {
-					const PlayerRole *extra_cards = driver->extraCards();
-					for (const Json &target : chosen) {
-						uint id = target.toUInt();
-						if (id < 3) {
-							seer->showExtraCard(id, extra_cards[id]);
-						}
+			} else {
+				const PlayerRole *extra_cards = driver->extraCards();
+				for (const Json &target : chosen) {
+					uint id = target.toUInt();
+					if (id < 3) {
+						seer->showExtraCard(id, extra_cards[id]);
 					}
 				}
-				std::this_thread::sleep_for(std::chrono::seconds(3));
 			}
-		});
+			std::this_thread::sleep_for(std::chrono::seconds(3));
+		}
 	}
 };
 
@@ -175,17 +175,16 @@ public:
 
 	void takeEffect(WerewolfDriver *driver, Player *robber) const override
 	{
-		robber->one(cmd::ChoosePlayer, [=] (const Json &args) {
-			uint chosen_id = args.toUInt();
-			Player *target = driver->findPlayer(chosen_id);
-			if (target) {
-				robber->showPlayerRole(target);
-				robber->setRole(target->role());
-				target->setRole(PlayerRole::Robber);
-			}
-		});
-
 		driver->broadcastToChoosePlayer(1);
+
+		Json answer = robber->getReply();
+		uint chosen_id = answer.toUInt();
+		Player *target = driver->findPlayer(chosen_id);
+		if (target) {
+			robber->showPlayerRole(target);
+			robber->setRole(target->role());
+			target->setRole(PlayerRole::Robber);
+		}
 	}
 };
 

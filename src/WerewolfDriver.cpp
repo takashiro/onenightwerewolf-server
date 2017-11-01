@@ -196,3 +196,11 @@ void WerewolfDriver::broadcastToChoosePlayer(int num)
 {
 	room()->broadcastRequest(cmd::ChoosePlayer, num);
 }
+
+void WerewolfDriver::broadcastToChoosePlayerOrCard(int player_num, int card_num)
+{
+	JsonObject args;
+	args["player"] = player_num;
+	args["card"] = card_num;
+	room()->broadcastRequest(cmd::ChoosePlayerOrCard, args);
+}
