@@ -42,10 +42,13 @@ public:
 	{
 	}
 
-	void takeEffect(WerewolfDriver *driver, Player *player) const override
+	void start(WerewolfDriver *driver) const override
 	{
 		driver->broadcastToChoosePlayer(1);
+	}
 
+	void takeEffect(WerewolfDriver *driver, Player *player) const override
+	{
 		Json answer = player->getReply();
 		uint chosen_id = answer.toUInt();
 		Player *target = driver->findPlayer(chosen_id);
@@ -73,7 +76,10 @@ public:
 			}
 			player->showPlayerRole(wolf);
 		}
+	}
 
+	void end(WerewolfDriver *) const override
+	{
 		std::this_thread::sleep_for(std::chrono::seconds(3));
 	}
 };
@@ -92,6 +98,10 @@ public:
 		for (Player *wolf : wolves) {
 			player->showPlayerRole(wolf);
 		}
+	}
+
+	void end(WerewolfDriver *) const override
+	{
 		std::this_thread::sleep_for(std::chrono::seconds(3));
 	}
 };
@@ -124,10 +134,13 @@ public:
 	{
 	}
 
-	void takeEffect(WerewolfDriver *driver, Player *seer) const override
+	void start(WerewolfDriver *driver) const override
 	{
 		driver->broadcastToChoosePlayerOrCard(1, 2);
+	}
 
+	void takeEffect(WerewolfDriver *driver, Player *seer) const override
+	{
 		Json answer = seer->getReply();
 		if (!answer.isObject()) {
 			return;
@@ -161,8 +174,12 @@ public:
 					}
 				}
 			}
-			std::this_thread::sleep_for(std::chrono::seconds(3));
 		}
+	}
+
+	void end(WerewolfDriver *) const override
+	{
+		std::this_thread::sleep_for(std::chrono::seconds(3));
 	}
 };
 
@@ -174,10 +191,13 @@ public:
 	{
 	}
 
-	void takeEffect(WerewolfDriver *driver, Player *robber) const override
+	void start(WerewolfDriver *driver) const override
 	{
 		driver->broadcastToChoosePlayer(1);
+	}
 
+	void takeEffect(WerewolfDriver *driver, Player *robber) const override
+	{
 		Json answer = robber->getReply();
 		uint chosen_id = answer.toUInt();
 		Player *target = driver->findPlayer(chosen_id);
@@ -197,10 +217,13 @@ public:
 	{
 	}
 
-	void takeEffect(WerewolfDriver *driver, Player *trouble_maker) const override
+	void start(WerewolfDriver *driver) const override
 	{
 		driver->broadcastToChoosePlayer(2);
+	}
 
+	void takeEffect(WerewolfDriver *driver, Player *trouble_maker) const override
+	{
 		Json answer = trouble_maker->getReply();
 		if (!answer.isArray()) {
 			return;
@@ -232,10 +255,13 @@ public:
 	{
 	}
 
-	void takeEffect(WerewolfDriver *driver, Player *drunk) const override
+	void start(WerewolfDriver *driver) const override
 	{
 		driver->broadcastToChooseCard(1);
+	}
 
+	void takeEffect(WerewolfDriver *driver, Player *drunk) const override
+	{
 		Json answer = drunk->getReply();
 		if (answer.isNull()) {
 			return;

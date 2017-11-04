@@ -129,11 +129,13 @@ void WerewolfDriver::run()
 
 	for (const PlayerAction *action : actions) {
 		room->broadcastNotification(cmd::UpdatePhase, static_cast<int>(action->role()));
+		action->start(this);
 		for (Player *player : d->players) {
 			if (action->isEffective(player)) {
 				action->takeEffect(this, player);
 			}
 		}
+		action->end(this);
 		delete action;
 		std::this_thread::sleep_for(std::chrono::seconds(2));
 	}
