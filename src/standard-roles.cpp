@@ -163,8 +163,8 @@ public:
 		}
 
 		auto j = input.find("targets");
-		if (j != input.end() && i->second.isArray()) {
-			const JsonArray &chosen = i->second.toArray();
+		if (j != input.end() && j->second.isArray()) {
+			const JsonArray &chosen = j->second.toArray();
 			if (chosen.empty()) {
 				return;
 			}
@@ -175,8 +175,13 @@ public:
 					seer->showPlayerRole(target);
 				}
 			} else {
+				if (chosen.size() < 2) {
+					return;
+				}
+
 				const PlayerRole *extra_cards = driver->extraCards();
-				for (const Json &target : chosen) {
+				for (int i = 0; i < 2; i++) {
+					const Json &target = chosen[i];
 					uint id = target.toUInt();
 					if (id < 3) {
 						seer->showExtraCard(id, extra_cards[id]);
