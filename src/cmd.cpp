@@ -59,23 +59,6 @@ std::map<int, KA_IMPORT UserAction> CreateWerewolfActions()
 		}
 	};
 
-	actions[cmd::ChoosePlayer] = [] (User *user, const Json &arg) {
-		Room *room = user->room();
-		if (room == nullptr) {
-			return;
-		}
-
-		WerewolfDriver *driver = dynamic_cast<WerewolfDriver *>(room->driver());
-		if (driver == nullptr) {
-			return;
-		}
-
-		Player *player = driver->findPlayer(user->id());
-		if (player) {
-			player->fire(cmd::ChoosePlayer, arg);
-		}
-	};
-
 	return actions;
 }
 
