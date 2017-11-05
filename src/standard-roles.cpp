@@ -50,7 +50,16 @@ public:
 	void takeEffect(WerewolfDriver *driver, Player *player) const override
 	{
 		Json answer = player->getReply();
-		uint chosen_id = answer.toUInt();
+		if (!answer.isArray()) {
+			return;
+		}
+
+		JsonArray selected_players = answer.toArray();
+		if (selected_players.empty()) {
+			return;
+		}
+
+		uint chosen_id = selected_players[0].toUInt();
 		Player *target = driver->findPlayer(chosen_id);
 		if (target) {
 			player->setRole(target->role());
@@ -199,7 +208,16 @@ public:
 	void takeEffect(WerewolfDriver *driver, Player *robber) const override
 	{
 		Json answer = robber->getReply();
-		uint chosen_id = answer.toUInt();
+		if (!answer.isArray()) {
+			return;
+		}
+
+		JsonArray selected_players = answer.toArray();
+		if (selected_players.empty()) {
+			return;
+		}
+
+		uint chosen_id = selected_players[0].toUInt();
 		Player *target = driver->findPlayer(chosen_id);
 		if (target) {
 			robber->showPlayerRole(target);
@@ -263,11 +281,16 @@ public:
 	void takeEffect(WerewolfDriver *driver, Player *drunk) const override
 	{
 		Json answer = drunk->getReply();
-		if (answer.isNull()) {
+		if (!answer.isArray()) {
 			return;
 		}
 
-		uint card_id = answer.toUInt();
+		JsonArray selected_cards = answer.toArray();
+		if (selected_cards.empty()) {
+			return;
+		}
+
+		uint card_id = selected_cards[0].toUInt();
 		if (card_id < 3) {
 			PlayerRole *cards = driver->extraCards();
 			PlayerRole old_role = drunk->role();
