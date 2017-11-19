@@ -35,6 +35,7 @@ public:
 	Player(KA_IMPORT User *user);
 	~Player();
 
+	KA_IMPORT uint uid() const;
 	KA_IMPORT User *user() const;
 
 	Role role() const;

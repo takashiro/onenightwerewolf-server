@@ -54,6 +54,11 @@ Player::~Player()
 	delete d;
 }
 
+KA_IMPORT uint Player::uid() const
+{
+	return d->user ? d->user->id() : 0;
+}
+
 KA_IMPORT User *Player::user() const
 {
 	return d->user;
