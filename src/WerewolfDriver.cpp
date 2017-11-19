@@ -141,6 +141,7 @@ void WerewolfDriver::run()
 	}
 	actions.clear();
 
+	// Daytime comes, phase of nobody
 	room->broadcastNotification(cmd::UpdatePhase, 0);
 }
 
@@ -168,6 +169,11 @@ void WerewolfDriver::setRoles(std::vector<PlayerRole> &&roles)
 const std::vector<PlayerRole> &WerewolfDriver::roles() const
 {
 	return d->roles;
+}
+
+const std::vector<Player *> &WerewolfDriver::players() const
+{
+	return d->players;
 }
 
 Player *WerewolfDriver::findPlayer(KA_IMPORT uint id) const

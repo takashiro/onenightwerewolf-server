@@ -48,6 +48,7 @@ public:
 	void setRoles(std::vector<PlayerRole> &&roles);
 	const std::vector<PlayerRole> &roles() const;
 
+	const std::vector<Player *> &players() const;
 	Player *findPlayer(KA_IMPORT uint id) const;
 	std::vector<Player *> findPlayers(PlayerRole role) const;
 
