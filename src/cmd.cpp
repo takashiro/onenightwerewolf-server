@@ -59,6 +59,38 @@ std::map<int, KA_IMPORT UserAction> CreateWerewolfActions()
 		}
 	};
 
+	actions[cmd::EndGame] = [] (User *user, const Json &) {
+		Room *room = user->room();
+		if (room == nullptr || room->state() != Room::State::Stopped) {
+			return;
+		}
+
+		WerewolfDriver *driver = dynamic_cast<WerewolfDriver *>(room->driver());
+		if (driver == nullptr) {
+			return;
+		}
+
+		JsonArray player_roles;
+		const std::vector<Player *> &players = driver->players();
+		for (Player *player : players) {
+			JsonObject info;
+			info["uid"] = player->uid();
+			info["role"] = static_cast<int>(player->role());
+			player_roles.push_back(std::move(info));
+		}
+
+		JsonArray unused_roles(3);
+		const PlayerRole *extra_cards = driver->extraCards();
+		for (int i = 0; i < 3; i++) {
+			unused_roles[i] = static_cast<int>(extra_cards[i]);
+		}
+
+		JsonObject args;
+		args["players"] = std::move(player_roles);
+		args["extra_cards"] = std::move(unused_roles);
+		room->broadcastNotification(cmd::EndGame, args);
+	};
+
 	return actions;
 }
 
