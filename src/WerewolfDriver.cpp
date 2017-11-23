@@ -31,6 +31,7 @@ takashiro@qq.com
 #include <vector>
 #include <thread>
 #include <algorithm>
+#include <random>
 
 KA_USING_NAMESPACE
 
@@ -102,7 +103,9 @@ void WerewolfDriver::run()
 	std::vector<PlayerRole> roles = d->roles;
 
 	// Arrange roles
-	std::random_shuffle(roles.begin(), roles.end());
+	std::random_device rd;
+	std::mt19937 g(rd());
+	std::shuffle(roles.begin(), roles.end(), g);
 	int i = 0;
 	for (Player *player : d->players) {
 		player->setRole(roles[i]);
