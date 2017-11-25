@@ -76,6 +76,11 @@ public:
 	{
 	}
 
+	void start(WerewolfDriver *driver) const override
+	{
+		driver->broadcastToChooseCard(1);
+	}
+
 	void takeEffect(WerewolfDriver *driver, Player *player) const override
 	{
 		std::vector<Player *> wolves = driver->findPlayers(PlayerRole::Werewolf);
@@ -84,6 +89,17 @@ public:
 				continue;
 			}
 			player->showPlayerRole(wolf);
+		}
+
+		if (wolves.size() == 1) {
+			Json answer = player->getReply();
+			uint index = answer.toUInt();
+			if (index > 2) {
+				index = 2;
+			}
+
+			const PlayerRole *extra_cards = driver->extraCards();
+			player->showExtraCard(index, extra_cards[index]);
 		}
 	}
 
