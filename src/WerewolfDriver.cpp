@@ -98,8 +98,6 @@ const Json &WerewolfDriver::config() const
 
 void WerewolfDriver::run()
 {
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-
 	std::vector<PlayerRole> roles = d->roles;
 
 	// Arrange roles
@@ -121,7 +119,7 @@ void WerewolfDriver::run()
 		player->deliverRoleCard();
 	}
 
-	std::this_thread::sleep_for(std::chrono::seconds(3));
+	std::this_thread::sleep_for(std::chrono::seconds(5));
 
 	std::vector<PlayerAction *> actions = CreatePlayerActions(d->roles);
 	std::sort(actions.begin(), actions.end(), [] (const PlayerAction *a1, const PlayerAction *a2) {
