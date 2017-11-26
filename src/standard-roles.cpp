@@ -302,22 +302,22 @@ public:
 	void takeEffect(WerewolfDriver *driver, Player *drunk) const override
 	{
 		Json answer = drunk->getReply();
-		if (!answer.isArray()) {
-			return;
+
+		uint index = 0;
+		if (answer.isArray()) {
+			JsonArray selected_cards = answer.toArray();
+			if (!selected_cards.empty()) {
+				index = selected_cards[0].toUInt();
+				if (index > 2) {
+					index = 2;
+				}
+			}
 		}
 
-		JsonArray selected_cards = answer.toArray();
-		if (selected_cards.empty()) {
-			return;
-		}
-
-		uint card_id = selected_cards[0].toUInt();
-		if (card_id < 3) {
-			PlayerRole *cards = driver->extraCards();
-			PlayerRole old_role = drunk->role();
-			drunk->setRole(cards[card_id]);
-			cards[card_id] = old_role;
-		}
+		PlayerRole *cards = driver->extraCards();
+		PlayerRole old_role = drunk->role();
+		drunk->setRole(cards[index]);
+		cards[index] = old_role;
 	}
 };
 
