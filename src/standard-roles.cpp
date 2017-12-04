@@ -30,6 +30,7 @@ takashiro@qq.com
 #include <algorithm>
 #include <chrono>
 #include <map>
+#include <set>
 #include <thread>
 
 KA_USING_NAMESPACE
@@ -366,8 +367,13 @@ std::vector<PlayerAction *> CreatePlayerActions(const std::vector<PlayerRole> &r
 {
 	static ActionMap action_map = CreateActionMap();
 
-	std::vector<PlayerAction *> actions;
+	std::set<PlayerRole> role_set;
 	for (PlayerRole role : roles) {
+		role_set.insert(role);
+	}
+
+	std::vector<PlayerAction *> actions;
+	for (PlayerRole role : role_set) {
 		ActionMap::const_iterator iter = action_map.find(role);
 		if (iter != action_map.end()) {
 			PlayerAction *action = (iter->second)();
