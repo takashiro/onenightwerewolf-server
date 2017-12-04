@@ -92,10 +92,16 @@ public:
 		}
 
 		if (wolves.size() == 1) {
+			uint index = 0;
 			Json answer = player->getReply();
-			uint index = answer.toUInt();
-			if (index > 2) {
-				index = 2;
+			if (answer.isArray()) {
+				const JsonArray &selected_cards = answer.toArray();
+				if (selected_cards.size() > 0) {
+					index = selected_cards[0].toUInt();
+					if (index > 2) {
+						index = 2;
+					}
+				}
 			}
 
 			const PlayerRole *extra_cards = driver->extraCards();
