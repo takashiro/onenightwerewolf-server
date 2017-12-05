@@ -30,6 +30,7 @@ takashiro@qq.com
 #include <algorithm>
 #include <chrono>
 #include <map>
+#include <random>
 #include <set>
 #include <thread>
 
@@ -276,15 +277,30 @@ public:
 		}
 
 		const JsonArray &targets = answer.toArray();
-		JsonArray::const_iterator iter = targets.begin();
-		Player *target[2] = {nullptr};
-		for (int i = 0; i < 2; i++) {
-			target[i] = driver->findPlayer((*iter).toUInt());
-			iter++;
+		Player *target[2] = {nullptr, nullptr};
+		if (targets.size() >= 2) {
+			for (int i = 0; i < 2; i++) {
+				target[i] = driver->findPlayer(targets[i].toUInt());
+			}
 		}
 
-		if (target[0] == nullptr || target[1] == nullptr) {
-			return;
+		// Validate selected players
+		for (int i = 0; i < 2; i++) {
+			if (target[i] == nullptr || target[i] == trouble_maker) {
+				std::vector<Player *> others = driver->players();
+				others.erase(std::find(others.begin(), others.end(), trouble_maker));
+				if (others.size() < 2) {
+					return;
+				}
+
+				std::random_device rd;
+				std::mt19937 g(rd());
+				std::shuffle(others.begin(), others.end(), g);
+
+				target[0] = others[0];
+				target[1] = others[1];
+				break;
+			}
 		}
 
 		PlayerRole tmp = target[0]->role();
