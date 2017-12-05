@@ -236,23 +236,34 @@ public:
 
 	void takeEffect(WerewolfDriver *driver, Player *robber) const override
 	{
+		Player *target = nullptr;
+
 		Json answer = robber->getReply();
-		if (!answer.isArray()) {
-			return;
+		if (answer.isArray()) {
+			JsonArray selected_players = answer.toArray();
+			if (!selected_players.empty()) {
+				uint chosen_id = selected_players[0].toUInt();
+				target = driver->findPlayer(chosen_id);
+			}
 		}
 
-		JsonArray selected_players = answer.toArray();
-		if (selected_players.empty()) {
-			return;
+		if (target == nullptr || target == robber) {
+			std::vector<Player *> others = driver->players();
+			others.erase(std::find(others.begin(), others.end(), robber));
+			if (others.empty()) {
+				return;
+			}
+
+			std::random_device rd;
+			std::mt19937 g(rd());
+			uint index = g();
+			index %= others.size();
+			target = others.at(index);
 		}
 
-		uint chosen_id = selected_players[0].toUInt();
-		Player *target = driver->findPlayer(chosen_id);
-		if (target) {
-			robber->showPlayerRole(target);
-			robber->setRole(target->role());
-			target->setRole(PlayerRole::Robber);
-		}
+		robber->showPlayerRole(target);
+		robber->setRole(target->role());
+		target->setRole(PlayerRole::Robber);
 	}
 };
 
