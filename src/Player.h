@@ -26,13 +26,16 @@ takashiro@qq.com
 #include <Json.h>
 
 #include <functional>
+#include <vector>
+
+class WerewolfDriver;
 
 class Player
 {
 public:
 	using Role = PlayerRole;
 
-	Player(KA_IMPORT User *user);
+	Player(WerewolfDriver *driver, KA_IMPORT User *user);
 	~Player();
 
 	KA_IMPORT uint uid() const;
@@ -49,7 +52,15 @@ public:
 	void showPlayerRole(Player *target);
 	void showExtraCard(KA_IMPORT uint id, PlayerRole role);
 
-	KA_IMPORT Json getReply() const;
+	KA_IMPORT Json fetchReply() const;
+
+	std::vector<Player *> fetchChosenPlayers() const;
+	Player *fetchChosenPlayer(Player *except = nullptr) const;
+	std::vector<Player *> fetchChosenPlayers(int num, Player *except = nullptr) const;
+
+	std::vector<int> fetchChosenCards() const;
+	int fetchChosenCard() const;
+	std::vector<int> fetchChosenCards(int num) const;
 
 	using Callback = std::function<void(const KA_IMPORT Json &)>;
 	void one(int command, const Callback &callback);

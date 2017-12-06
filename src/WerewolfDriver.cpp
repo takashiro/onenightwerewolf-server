@@ -152,7 +152,7 @@ void WerewolfDriver::end()
 
 void WerewolfDriver::addPlayer(KA_IMPORT User *user)
 {
-	d->players.push_back(new Player(user));
+	d->players.push_back(new Player(this, user));
 }
 
 void WerewolfDriver::removePlayer(KA_IMPORT User *user)

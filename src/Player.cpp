@@ -21,31 +21,37 @@ takashiro@qq.com
 #include "Player.h"
 
 #include "cmd.h"
+#include "WerewolfDriver.h"
 
 #include <Json.h>
 #include <User.h>
 
+#include <algorithm>
 #include <map>
+#include <random>
 
 KA_USING_NAMESPACE
 
 struct Player::Private
 {
+	WerewolfDriver *driver;
 	User *user;
 	PlayerRole role;
 	PlayerRole initialRole;
 	std::multimap<int, Player::Callback> callbacks;
 
 	Private()
-		: user(nullptr)
+		: driver(nullptr)
+		, user(nullptr)
 		, role(PlayerRole::Unknown)
 	{
 	}
 };
 
-Player::Player(KA_IMPORT User *user)
+Player::Player(WerewolfDriver *driver, KA_IMPORT User *user)
 	: d(new Private)
 {
+	d->driver = driver;
 	d->user = user;
 }
 
@@ -108,9 +114,141 @@ void Player::showExtraCard(KA_IMPORT uint id, PlayerRole role)
 	d->user->notify(cmd::ShowExtraCard, info);
 }
 
-KA_IMPORT Json Player::getReply() const
+KA_IMPORT Json Player::fetchReply() const
 {
-	return d->user->getReply();
+	return d->user->fetchReply();
+}
+
+std::vector<Player *> Player::fetchChosenPlayers() const
+{
+	std::vector<Player *> targets;
+
+	Json answer = this->fetchReply();
+	if (!answer.isArray()) {
+		return targets;
+	}
+
+	JsonArray selected_players = answer.toArray();
+	if (selected_players.empty()) {
+		return targets;
+	}
+
+	for (const Json &selected : selected_players) {
+		uint chosen_id = selected.toUInt();
+		Player *target = d->driver->findPlayer(chosen_id);
+		if (target) {
+			targets.push_back(target);
+		}
+	}
+
+	return targets;
+}
+
+Player *Player::fetchChosenPlayer(Player *except) const
+{
+	std::vector<Player *> targets = this->fetchChosenPlayers();
+	if (!targets.empty() && targets[0] != except) {
+		return targets[0];
+	}
+
+	const std::vector<Player *> &players = d->driver->players();
+	if (players.empty()) {
+		return nullptr;
+	}
+
+	if (players.size() == 1) {
+		return players[0] != except ? players[0] : nullptr;
+	}
+
+	std::random_device rd;
+	std::mt19937 g(rd());
+	for (;;) {
+		uint index = g() % players.size();
+		Player *target = players[index];
+		if (target != except) {
+			return target;
+		}
+	}
+}
+
+std::vector<Player *> Player::fetchChosenPlayers(int num, Player *except) const
+{
+	std::vector<Player *> targets = this->fetchChosenPlayers();
+	if (except) {
+		auto iter = std::find(targets.begin(), targets.end(), except);
+		if (iter != targets.end()) {
+			targets.erase(iter);
+		}
+	}
+	if (targets.size() >= num) {
+		return targets;
+	}
+
+	std::vector<Player *> others = d->driver->players();
+	if (except) {
+		others.erase(std::find(others.begin(), others.end(), except));
+	}
+
+	std::random_device rd;
+	std::mt19937 g(rd());
+	std::shuffle(others.begin(), others.end(), g);
+	if (others.size() > num) {
+		others.resize(num);
+	}
+
+	return others;
+}
+
+std::vector<int> Player::fetchChosenCards() const
+{
+	std::vector<int> cards;
+
+	Json answer = this->fetchReply();
+	if (!answer.isArray()) {
+		return cards;
+	}
+
+	JsonArray selected_cards = answer.toArray();
+	if (selected_cards.empty()) {
+		return cards;
+	}
+
+	for (const Json &selected : selected_cards) {
+		int index = selected.toInt();
+		if (0 <= index && index < 3) {
+			cards.push_back(index);
+		}
+	}
+
+	return cards;
+}
+
+int Player::fetchChosenCard() const
+{
+	std::vector<int> cards = this->fetchChosenCards();
+	if (!cards.empty()) {
+		return cards[0];
+	}
+
+	std::random_device rd;
+	std::mt19937 g(rd());
+	return static_cast<int>(g() % 3);
+}
+
+std::vector<int> Player::fetchChosenCards(int num) const
+{
+	std::vector<int> cards = this->fetchChosenCards();
+	if (cards.size() >= num) {
+		return cards;
+	}
+
+	std::random_device rd;
+	std::mt19937 g(rd());
+	while (cards.size() < num) {
+		cards.push_back(static_cast<int>(g() % 3));
+	}
+
+	return cards;
 }
 
 void Player::one(int command, const Callback &callback)

@@ -49,23 +49,13 @@ public:
 		driver->broadcastToChoosePlayer(1);
 	}
 
-	void takeEffect(WerewolfDriver *driver, Player *player) const override
+	void takeEffect(WerewolfDriver *, Player *doppelganger) const override
 	{
-		Json answer = player->getReply();
-		if (!answer.isArray()) {
-			return;
-		}
-
-		JsonArray selected_players = answer.toArray();
-		if (selected_players.empty()) {
-			return;
-		}
-
-		uint chosen_id = selected_players[0].toUInt();
-		Player *target = driver->findPlayer(chosen_id);
+		Player *target = doppelganger->fetchChosenPlayer(doppelganger);
 		if (target) {
-			player->setRole(target->role());
-			player->showPlayerRole(target);
+			doppelganger->showPlayerRole(target);
+			doppelganger->setRole(target->role());
+			doppelganger->showPlayerRole(doppelganger);
 		}
 	}
 };
@@ -83,31 +73,20 @@ public:
 		driver->broadcastToChooseCard(1);
 	}
 
-	void takeEffect(WerewolfDriver *driver, Player *player) const override
+	void takeEffect(WerewolfDriver *driver, Player *werewolf) const override
 	{
 		std::vector<Player *> wolves = driver->findPlayers(PlayerRole::Werewolf);
 		for (Player *wolf : wolves) {
-			if (wolf == player) {
+			if (wolf == werewolf) {
 				continue;
 			}
-			player->showPlayerRole(wolf);
+			werewolf->showPlayerRole(wolf);
 		}
 
 		if (wolves.size() == 1) {
-			uint index = 0;
-			Json answer = player->getReply();
-			if (answer.isArray()) {
-				const JsonArray &selected_cards = answer.toArray();
-				if (selected_cards.size() > 0) {
-					index = selected_cards[0].toUInt();
-					if (index > 2) {
-						index = 2;
-					}
-				}
-			}
-
+			int index = werewolf->fetchChosenCard();
 			const PlayerRole *extra_cards = driver->extraCards();
-			player->showExtraCard(index, extra_cards[index]);
+			werewolf->showExtraCard(index, extra_cards[index]);
 		}
 	}
 
@@ -174,7 +153,7 @@ public:
 
 	void takeEffect(WerewolfDriver *driver, Player *seer) const override
 	{
-		Json answer = seer->getReply();
+		Json answer = seer->fetchReply();
 		if (!answer.isObject()) {
 			return;
 		}
@@ -234,36 +213,14 @@ public:
 		driver->broadcastToChoosePlayer(1);
 	}
 
-	void takeEffect(WerewolfDriver *driver, Player *robber) const override
+	void takeEffect(WerewolfDriver *, Player *robber) const override
 	{
-		Player *target = nullptr;
-
-		Json answer = robber->getReply();
-		if (answer.isArray()) {
-			JsonArray selected_players = answer.toArray();
-			if (!selected_players.empty()) {
-				uint chosen_id = selected_players[0].toUInt();
-				target = driver->findPlayer(chosen_id);
-			}
+		Player *target = robber->fetchChosenPlayer(robber);
+		if (target) {
+			robber->showPlayerRole(target);
+			robber->setRole(target->role());
+			target->setRole(PlayerRole::Robber);
 		}
-
-		if (target == nullptr || target == robber) {
-			std::vector<Player *> others = driver->players();
-			others.erase(std::find(others.begin(), others.end(), robber));
-			if (others.empty()) {
-				return;
-			}
-
-			std::random_device rd;
-			std::mt19937 g(rd());
-			uint index = g();
-			index %= others.size();
-			target = others.at(index);
-		}
-
-		robber->showPlayerRole(target);
-		robber->setRole(target->role());
-		target->setRole(PlayerRole::Robber);
 	}
 };
 
@@ -280,43 +237,14 @@ public:
 		driver->broadcastToChoosePlayer(2);
 	}
 
-	void takeEffect(WerewolfDriver *driver, Player *trouble_maker) const override
+	void takeEffect(WerewolfDriver *, Player *trouble_maker) const override
 	{
-		Json answer = trouble_maker->getReply();
-		if (!answer.isArray()) {
-			return;
+		std::vector<Player *> targets = trouble_maker->fetchChosenPlayers(2, trouble_maker);
+		if (targets.size() > 2) {
+			PlayerRole tmp = targets[0]->role();
+			targets[0]->setRole(targets[1]->role());
+			targets[1]->setRole(tmp);
 		}
-
-		const JsonArray &targets = answer.toArray();
-		Player *target[2] = {nullptr, nullptr};
-		if (targets.size() >= 2) {
-			for (int i = 0; i < 2; i++) {
-				target[i] = driver->findPlayer(targets[i].toUInt());
-			}
-		}
-
-		// Validate selected players
-		for (int i = 0; i < 2; i++) {
-			if (target[i] == nullptr || target[i] == trouble_maker) {
-				std::vector<Player *> others = driver->players();
-				others.erase(std::find(others.begin(), others.end(), trouble_maker));
-				if (others.size() < 2) {
-					return;
-				}
-
-				std::random_device rd;
-				std::mt19937 g(rd());
-				std::shuffle(others.begin(), others.end(), g);
-
-				target[0] = others[0];
-				target[1] = others[1];
-				break;
-			}
-		}
-
-		PlayerRole tmp = target[0]->role();
-		target[0]->setRole(target[1]->role());
-		target[1]->setRole(tmp);
 	}
 };
 
@@ -335,19 +263,7 @@ public:
 
 	void takeEffect(WerewolfDriver *driver, Player *drunk) const override
 	{
-		Json answer = drunk->getReply();
-
-		uint index = 0;
-		if (answer.isArray()) {
-			JsonArray selected_cards = answer.toArray();
-			if (!selected_cards.empty()) {
-				index = selected_cards[0].toUInt();
-				if (index > 2) {
-					index = 2;
-				}
-			}
-		}
-
+		int index = drunk->fetchChosenCard();
 		PlayerRole *cards = driver->extraCards();
 		PlayerRole old_role = drunk->role();
 		drunk->setRole(cards[index]);
@@ -363,7 +279,7 @@ public:
 	{
 	}
 
-	void takeEffect(WerewolfDriver *driver, Player *insomniac) const override
+	void takeEffect(WerewolfDriver *, Player *insomniac) const override
 	{
 		insomniac->showPlayerRole(insomniac);
 	}
