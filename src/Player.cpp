@@ -215,7 +215,7 @@ std::vector<int> Player::fetchChosenCards() const
 
 	for (const Json &selected : selected_cards) {
 		int index = selected.toInt();
-		if (0 <= index && index < 3) {
+		if (0 <= index && index < d->driver->extraCardNum()) {
 			cards.push_back(index);
 		}
 	}
@@ -232,7 +232,7 @@ int Player::fetchChosenCard() const
 
 	std::random_device rd;
 	std::mt19937 g(rd());
-	return static_cast<int>(g() % 3);
+	return static_cast<int>(g() % d->driver->extraCardNum());
 }
 
 std::vector<int> Player::fetchChosenCards(int num) const
@@ -245,7 +245,7 @@ std::vector<int> Player::fetchChosenCards(int num) const
 	std::random_device rd;
 	std::mt19937 g(rd());
 	while (cards.size() < num) {
-		cards.push_back(static_cast<int>(g() % 3));
+		cards.push_back(static_cast<int>(g() % d->driver->extraCardNum()));
 	}
 
 	return cards;

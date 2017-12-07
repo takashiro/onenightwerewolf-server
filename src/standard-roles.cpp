@@ -185,8 +185,8 @@ public:
 				const PlayerRole *extra_cards = driver->extraCards();
 				for (int i = 0; i < 2; i++) {
 					const Json &target = chosen[i];
-					uint id = target.toUInt();
-					if (id < 3) {
+					int id = target.toInt();
+					if (0 <= id && id < driver->extraCardNum()) {
 						seer->showExtraCard(id, extra_cards[id]);
 					}
 				}

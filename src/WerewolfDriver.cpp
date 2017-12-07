@@ -40,7 +40,14 @@ struct WerewolfDriver::Private
 	Json config;
 	std::vector<PlayerRole> roles;
 	std::vector<Player *> players;
+
+	int extraCardNum;
 	PlayerRole extraCards[3];
+
+	Private()
+		: extraCardNum(3)
+	{
+	}
 
 	void updateConfig()
 	{
@@ -51,6 +58,7 @@ struct WerewolfDriver::Private
 			roles.push_back(static_cast<int>(role));
 		}
 		config["roles"] = roles;
+		config["extra_card_num"] = extraCardNum;
 
 		this->config = std::move(config);
 	}
@@ -98,6 +106,11 @@ const Json &WerewolfDriver::config() const
 
 void WerewolfDriver::run()
 {
+	// Validate configuration
+	if (d->roles.size() < d->players.size() + this->extraCardNum()) {
+		return;
+	}
+
 	std::vector<PlayerRole> roles = d->roles;
 
 	// Arrange roles
@@ -110,7 +123,7 @@ void WerewolfDriver::run()
 		player->setInitialRole(roles[i]);
 		i++;
 	}
-	for (int j = 0; j < 3; j++, i++) {
+	for (int j = 0; j < d->extraCardNum; j++, i++) {
 		d->extraCards[j] = roles[i];
 	}
 
@@ -138,7 +151,7 @@ void WerewolfDriver::run()
 		}
 		action->end(this);
 		delete action;
-		std::this_thread::sleep_for(std::chrono::seconds(2));
+		std::this_thread::sleep_for(std::chrono::seconds(4));
 	}
 	actions.clear();
 
@@ -196,6 +209,11 @@ std::vector<Player *> WerewolfDriver::findPlayers(PlayerRole role) const
 		}
 	}
 	return targets;
+}
+
+int WerewolfDriver::extraCardNum() const
+{
+	return d->extraCardNum;
 }
 
 PlayerRole *WerewolfDriver::extraCards()
