@@ -217,9 +217,10 @@ public:
 	{
 		Player *target = robber->fetchChosenPlayer(robber);
 		if (target) {
-			robber->showPlayerRole(target);
+			PlayerRole role = robber->role();
 			robber->setRole(target->role());
-			target->setRole(PlayerRole::Robber);
+			target->setRole(role);
+			robber->showPlayerRole(robber);
 		}
 	}
 };
