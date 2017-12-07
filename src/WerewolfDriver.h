@@ -55,8 +55,8 @@ public:
 	PlayerRole *extraCards();
 	const PlayerRole *extraCards() const;
 
-	void broadcastToChoosePlayer(int num);
-	void broadcastToChoosePlayerOrCard(int player_num, int card_num);
+	void broadcastToChoosePlayer(int num, bool exclude_self = true);
+	void broadcastToChoosePlayerOrCard(int player_num, int card_num, bool exclude_self = true);
 	void broadcastToChooseCard(int num);
 
 private:

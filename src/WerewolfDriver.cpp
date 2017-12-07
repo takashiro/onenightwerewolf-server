@@ -208,16 +208,20 @@ const PlayerRole *WerewolfDriver::extraCards() const
 	return d->extraCards;
 }
 
-void WerewolfDriver::broadcastToChoosePlayer(int num)
-{
-	room()->broadcastRequest(cmd::ChoosePlayer, num);
-}
-
-void WerewolfDriver::broadcastToChoosePlayerOrCard(int player_num, int card_num)
+void WerewolfDriver::broadcastToChoosePlayer(int num, bool exclude_self)
 {
 	JsonObject args;
-	args["player"] = player_num;
-	args["card"] = card_num;
+	args["num"] = num;
+	args["exclude_self"] = exclude_self;
+	room()->broadcastRequest(cmd::ChoosePlayer, args);
+}
+
+void WerewolfDriver::broadcastToChoosePlayerOrCard(int player_num, int card_num, bool exclude_self)
+{
+	JsonObject args;
+	args["player_num"] = player_num;
+	args["card_num"] = card_num;
+	args["exclude_self"] = exclude_self;
 	room()->broadcastRequest(cmd::ChoosePlayerOrCard, args);
 }
 
