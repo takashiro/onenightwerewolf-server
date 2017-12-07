@@ -92,18 +92,18 @@ void Player::setInitialRole(Role role)
 
 void Player::deliverRoleCard()
 {
-	if (d->user) {
-		int role = static_cast<int>(d->role);
-		d->user->notify(cmd::DeliverRoleCard, role);
-	}
+	showPlayerRole(this);
 }
 
 void Player::showPlayerRole(Player *target)
 {
-	JsonObject args;
-	args["uid"] = target->user()->id();
-	args["role"] = static_cast<int>(target->role());
-	d->user->notify(cmd::ShowPlayerRole, args);
+	User *user = target->user();
+	if (user) {
+		JsonObject args;
+		args["uid"] = user->id();
+		args["role"] = static_cast<int>(target->role());
+		d->user->notify(cmd::ShowPlayerRole, args);
+	}
 }
 
 void Player::showExtraCard(KA_IMPORT uint id, PlayerRole role)

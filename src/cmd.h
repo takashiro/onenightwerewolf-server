@@ -29,7 +29,6 @@ namespace cmd
 		Invalid = KA_IMPORT net::NetworkCommandCount,
 
 		UpdatePlayer,
-		DeliverRoleCard,
 		UpdatePhase,
 		ChoosePlayer,
 		ChoosePlayerOrCard,
